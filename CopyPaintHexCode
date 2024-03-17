@@ -1,0 +1,51 @@
+-- Copy Paint Hex Code
+
+local SCRIPT_VERSION = "0.1"
+
+local APPEARANCE_MENU = "Vehicle>Los Santos Customs>Appearance"
+local menus = {
+    primary={
+        enter_hex=menu.ref_by_path(APPEARANCE_MENU..">Primary Colour>Enter Hex Code"),
+        red=menu.ref_by_path(APPEARANCE_MENU..">Primary Colour>Red"),
+        green=menu.ref_by_path(APPEARANCE_MENU..">Primary Colour>Green"),
+        blue=menu.ref_by_path(APPEARANCE_MENU..">Primary Colour>Blue"),
+    },
+    secondary={
+        enter_hex=menu.ref_by_path(APPEARANCE_MENU..">Secondary Colour>Enter Hex Code"),
+        red=menu.ref_by_path(APPEARANCE_MENU..">Secondary Colour>Red"),
+        green=menu.ref_by_path(APPEARANCE_MENU..">Secondary Colour>Green"),
+        blue=menu.ref_by_path(APPEARANCE_MENU..">Secondary Colour>Blue"),
+    }
+}
+
+local function dec_to_hex(input)
+    return ('%X'):format(input)
+end
+
+local function color_rgb_to_hex(red, green, blue)
+    return dec_to_hex(red) .. dec_to_hex(green) .. dec_to_hex(blue)
+end
+
+local function get_hexcode_for_menu(sub_menu)
+    return color_rgb_to_hex(sub_menu.red.value, sub_menu.green.value, sub_menu.blue.value)
+end
+
+---
+--- Menus
+---
+
+menus.primary.display_hex = menus.primary.enter_hex:attachBefore(menu.shadow_root():readonly("Hex Code", ""))
+menus.primary.display_hex:onTickInViewport(function()
+    menus.primary.display_hex.value = get_hexcode_for_menu(menus.primary)
+end)
+
+menus.secondary.display_hex = menus.secondary.enter_hex:attachBefore(menu.shadow_root():readonly("Hex Code", ""))
+menus.secondary.display_hex:onTickInViewport(function()
+    menus.secondary.display_hex.value = get_hexcode_for_menu(menus.secondary)
+end)
+
+menu.my_root():readonly("Version", SCRIPT_VERSION)
+menu.my_root():readonly("New menu options now available", "While this script is running, an additional 'Hex Code' menu item is available within the Vehicle>Los Santos Customs>Appearance>Colour menus.")
+menu.my_root():action("Jump to Primary Colour Menu", {}, "", function()
+    menus.primary.display_hex:focus()
+end)
